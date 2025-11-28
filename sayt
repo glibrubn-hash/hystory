@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Тести з підручника</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{max-width:900px;margin:32px auto;padding:16px;background:#f0f4f8;color:#333}
+    h1{font-size:2rem;text-align:center;margin-bottom:24px;color:#1e88e5}
+    .tests-list{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:16px 0}
+    .test-btn{padding:14px 20px;border-radius:10px;border:none;background:#1e88e5;color:white;font-weight:600;cursor:pointer;transition:0.3s}
+    .test-btn:hover{background:#1565c0}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000}
+    .card{background:#fff;padding:24px;border-radius:12px;max-width:720px;width:100%;max-height:80vh;overflow:auto;box-shadow:0 8px 25px rgba(0,0,0,0.2)}
+    .q{margin-bottom:16px;font-size:1.1rem}
+    .option{display:block;padding:10px;border-radius:8px;border:1px solid #ddd;margin:8px 0;cursor:pointer;transition:0.2s;background:#f9f9f9}
+    .option:hover{background:#e0f0ff}
+    .footer{margin-top:20px;color:#666;text-align:center;font-size:0.9rem}
+    button#closeModal{background:#c62828;color:white;padding:8px 12px;border:none;border-radius:8px;cursor:pointer;transition:0.3s}
+    button#closeModal:hover{background:#b71c1c}
+  </style>
+</head>
+<body>
+  <h1>Тести з підручника</h1>
+  <div id="buttons" class="tests-list"></div>
+
+  <div id="modal" style="display:none" class="modal">
+    <div class="card" role="dialog" aria-modal="true">
+      <div id="testContent"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px">
+        <button id="closeModal">Закрити</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let tests = [
+      { title: "Тест 1 (Параграф 1)", questions:[
+        { text: "Де народився Марко Поло?", options: ["У Пекіні","У Римі","У Венеції","У Константинополі"], answer: 2 },
+        { text: "Чим займалася сім’я Поло?", options: ["Рибальством","Торгівлею","Землеробством","Будівництвом кораблів"], answer: 1 },
+        { text: "Чому Марко ріс без батька?", options: ["Батько був у поході","Батько працював у суді","Батько був у довгій торговій мандрівці","Батько жив в іншій країні"], answer: 2 }
+      ]},
+      { title: "Тест 2 (Параграф 2)", questions:[
+        { text: "Що вивчав Марко Поло в дитинстві?", options: ["Лікарську справу","Основи торгівлі","Морську навігацію","Філософію Сходу"], answer: 1 },
+        { text: "Що надихало Марко цікавитися світом?", options: ["Історії купців","Театральні вистави","Навчання у школі музики","Полювання"], answer: 0 },
+        { text: "Яка риса формувалася у Марко з дитинства?", options: ["Байдужість","Обережність","Допитливість","Сумнівність"], answer: 2 }
+      ]},
+      { title: "Тест 3 (Параграф 3)", questions:[
+        { text: "Звідки повернулися батько й дядько Марко?", options: ["З Африки","З Індії","З Монголії","З Франції"], answer: 2 },
+        { text: "Кого вони зустрічали на Сході?", options: ["Аллудина","Тимура","Хубілая","Чингісхана"], answer: 2 },
+        { text: "Чому вони вирішили повернутися на Схід?", options: ["Через багатства","Через наказ Папи","Через прохання Хубілая","Через війну в Європі"], answer: 2 }
+      ]},
+      { title: "Тест 4 (Параграф 4)", questions:[
+        { text: "У якому році Поло вирушили у свою велику подорож?", options: ["1254","1269","1271","1295"], answer: 2 },
+        { text: "Які міста вони відвідали на початку шляху?", options: ["Рим і Флоренцію","Акру і Мосул","Париж і Лондон","Самарканд і Бухару"], answer: 1 },
+        { text: "Які небезпеки чекали подорожніх?", options: ["Шторм на морі","Розбійники та хвороби","Військові кораблі","Виверження вулканів"], answer: 1 }
+      ]},
+      { title: "Тест 5 (Параграф 5)", questions:[
+        { text: "Яку територію Поло проходили після Близького Сходу?", options: ["Китай","Персію","Індію","Сирію"], answer: 1 },
+        { text: "Яка природна зона була однією з найскладніших?", options: ["Тундра","Джунглі","Пустеля Лут","Тайга"], answer: 2 },
+        { text: "Яким був один зі шляхів, якими вони йшли?", options: ["Шлях рабів","Великий шовковий шлях","Соляний шлях","Балтійський шлях"], answer: 1 }
+      ]},
+      { title: "Тест 6 (Параграф 6)", questions:[
+        { text: "Як називалася столиця Хубілая?", options: ["Самарканд","Ханбалик","Бухара","Каракорум"], answer: 3 },
+        { text: "Хто був правителем, до якого прибули Поло?", options: ["Чингісхан","Хан Батий","Хубілай","Тимур"], answer: 2 },
+        { text: "Чим Марко сподобався Хубілаю?", options: ["Вмінням співати","Високим зростом","Розумом та цікавістю","Знанням медицини"], answer: 2 }
+      ]},
+      { title: "Тест 7 (Параграф 7)", questions:[
+        { text: "Куди подорожував Марко за дорученням хана?", options: ["До Африки","До Єгипту","До різних частин Азії","До Європи"], answer: 2 },
+        { text: "Що він описував у своїх записах?", options: ["Європейську зброю","Африканські ліси","Паперові гроші, вугілля, порцеляну","Міста Європи"], answer: 2 },
+        { text: "Який народ він вивчав?", options: ["Майя","Римлян","Китайців","Греків"], answer: 2 }
+      ]},
+      { title: "Тест 8 (Параграф 8)", questions:[
+        { text: "Ким працював Марко Поло при хані?", options: ["Солдатом","Лікарем","Чиновником","Музикантом"], answer: 2 },
+        { text: "Скільки років він провів на службі?", options: ["5","10","17","25"], answer: 2 },
+        { text: "Які завдання він виконував?", options: ["Розмальовував храми","Охороняв палац","Дипломатичні та адміністративні","Складав музику"], answer: 2 }
+      ]},
+      { title: "Тест 9 (Параграф 9)", questions:[
+        { text: "У якому році Марко повернувся?", options: ["1271","1280","1295","1305"], answer: 2 },
+        { text: "Хто записав історію Марко Поло?", options: ["Данте","Шекспір","Рустікелло да Піза","Папа Боніфацій"], answer: 2 },
+        { text: "Як називається книга Марко?", options: ["«Подорож на Захід»","Chronica Universalis","Опис світу","Записки мандрівника"], answer: 2 }
+      ]},
+      { title: "Тест 10 (Параграф 10)", questions:[
+        { text: "Як вплинула книга Марко Поло?", options: ["Ніхто про неї не знав","Вона відкрила Європі знання про Азію","Вона була заборонена","Вона описувала лише Венецію"], answer: 1 },
+        { text: "Хто користувався його книгою?", options: ["Моцарт","Цезар","Христофор Колумб","Нерон"], answer: 2 },
+        { text: "Що стало символом образу Марко Поло?", options: ["Замкнутість","Страх","Сміливість і відкриття світу","Лицарські турніри"], answer: 2 }
+      ]}
+    ];
+
+    const buttonsDiv = document.getElementById('buttons');
+    const modal = document.getElementById('modal');
+    const testContent = document.getElementById('testContent');
+
+    function renderButtons(){
+      buttonsDiv.innerHTML='';
+      tests.forEach((t,i)=>{
+        const btn=document.createElement('button');
+        btn.className='test-btn';
+        btn.textContent=t.title;
+        btn.onclick=()=>openTest(i);
+        buttonsDiv.appendChild(btn);
+      });
+    }
+
+    function openTest(index){
+      const test=tests[index];
+      let current=0;
+      let score=0;
+      modal.style.display='flex';
+      renderQuestion();
+
+      function renderQuestion(){
+        const q=test.questions[current];
+        testContent.innerHTML='';
+        const title=document.createElement('h2');
+        title.textContent=test.title+` — Питання ${current+1}/${test.questions.length}`;
+        testContent.appendChild(title);
+
+        const qdiv=document.createElement('div');
+        qdiv.className='q';
+        const qtext=document.createElement('div');
+        qtext.textContent=q.text;
+        qdiv.appendChild(qtext);
+
+        q.options.forEach((opt,i)=>{
+          const o=document.createElement('div');
+          o.className='option';
+          o.textContent=opt;
+          o.onclick=()=>{
+            if(i===q.answer){ o.style.background='#c8f7c5'; o.style.borderColor='#3c9a3c'; score++; }
+            else { o.style.background='#f7c5c5'; o.style.borderColor='#b33939'; }
+            [...qdiv.children].forEach(el=>{ if(el.classList.contains('option')) el.style.pointerEvents='none'; });
+            const correct=qdiv.children[q.answer+1];
+            correct.style.background='#c8f7c5'; correct.style.borderColor='#3c9a3c';
+
+            const nextBtn=document.createElement('button');
+            nextBtn.textContent=current<test.questions.length-1?'Далі':'Завершити';
+            nextBtn.style.marginTop='12px';
+            nextBtn.onclick=()=>{
+              if(current<test.questions.length-1){ current++; renderQuestion(); }
+              else {
+                testContent.innerHTML=`<h2>Тест завершено!</h2><p>Правильних відповідей: ${score}</p><p>Неправильних відповідей: ${test.questions.length - score}</p>`;
+              }
+            };
+            testContent.appendChild(nextBtn);
+          };
+          qdiv.appendChild(o);
+        });
+        testContent.appendChild(qdiv);
+      }
+    }
+
+    document.getElementById('closeModal').onclick=()=>{ modal.style.display='none'; }
+
+    renderButtons();
+  </script>
+  <div class="footer">Сайт "Тести з підручника"</div>
+</body>
+</html>
